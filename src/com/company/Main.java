@@ -1,6 +1,14 @@
 package com.company;
+import com.company.entity.References;
+
 import java.lang.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -108,15 +116,18 @@ public class Main {
     public static void showLoginPage()
     {
         Scanner in = new Scanner(System.in);
+        System.out.println("请输入账号：");
         int uid = in.nextInt();
         //吸收换行
         in.nextLine();
+        System.out.println("请输入密码：");
         String password = in.nextLine();
 
         int code = login(uid,password);
         if(code == 1)
         {
             System.out.println("账号不存在, 正在进入注册界面");
+            showRegister();
         }
         else if(code == 2)
         {
@@ -125,6 +136,124 @@ public class Main {
         else if(code == 0)
         {
             System.out.println("登录成功, 正在进入首页");
+        }
+    }
+
+
+    /*
+     功能: 创建新用户
+    参数:
+        uid: 用户id，password：用户密码
+    返回值:
+        创建成功，返回用户名
+     */
+    public static String addUserBy(int uid, String userName,String password)
+    {
+        //新增id
+        int length = References.ids.length;
+        int[] ids1 = new int[length + 1];
+        for(int i = 0;i < length + 1;i++)
+        {
+            if(i < length)
+                ids1[i] = References.ids[i];
+            else if(i == length)
+            {
+                ids1[i] = uid;
+            }
+        }
+        References.ids = ids1;
+
+        //新增用户名
+        int length_name = References.names.length;
+        String[] names1 = new String[length_name + 1];
+        for(int i = 0;i < length_name + 1;i++)
+        {
+            if(i < length_name)
+            {
+                names1[i] = References.names[i];
+            }
+            else if(i == length_name)
+            {
+                names1[i] = userName;
+            }
+        }
+        References.names = names1;
+
+        //新增密码
+        int length_pw = References.passwords.length;
+        String[] pw = new String[length_pw + 1];
+        for(int i = 0;i < length_pw + 1;i++)
+        {
+            if(i < length_pw)
+            {
+                pw[i] = References.passwords[i];
+            }
+            else if(i == length_pw)
+            {
+                pw[i] = password;
+            }
+        }
+        References.passwords = pw;
+        return userName;
+    }
+    /*
+        功能: 传入用户id和密码, 根据上面两个函数(selectUserById，addUserBy)来获取相应用户数据,并注册用户
+        传入用户id 查询用户名是否存在
+        如果用户不存在 则注册新用户
+    参数:
+        uid: 用户账户
+        password: 用户密码
+    返回值:
+        如果账号已存在, 返回1
+        如果注册失败，返回2
+        如果注册成功, 返回0
+     */
+    public static int register(int uid,String userName,String password)
+    {
+        if(selectUserById(uid) != null)
+            return 1;
+        String userName_1 = addUserBy(uid,userName,password);
+        if(userName_1 == null)
+            return 2;
+        return 0;
+    }
+
+     /*
+    功能: 提示用户输入账号用户名和密码, 根据register函数判断是否注册成功,
+    如果成功提示进入登录页面
+    如果注册失败
+        账号已存在: 提示账号已存在。
+    参数: 无
+    返回值: 无
+    */
+    public static void showRegister()
+    {
+        System.out.println("进入注册页面。");
+        Scanner in = new Scanner(System.in);
+        System.out.println("请输入账号：");
+        int uid = in.nextInt();
+        //吸收换行
+        in.nextLine();
+
+        System.out.println("请输入用户名：");
+        String userName = in.nextLine();
+
+        System.out.println("请输入密码：");
+        String password = in.nextLine();
+
+        Integer registerCode = register(uid,userName,password);
+        if(registerCode == 1)
+        {
+            System.out.println("账号已存在，注册失败");
+        }
+        else if(registerCode == 2)
+        {
+            System.out.println("注册失败");
+        }
+        else if(registerCode == 0)
+        {
+            System.out.println("注册成功，跳转至登录页面");
+            showLoginPage();
         }
     }
 }
